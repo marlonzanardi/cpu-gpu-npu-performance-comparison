@@ -1,0 +1,22 @@
+[project]
+name = "inference-bench"
+version = "0.1.0"
+description = "Compare one Core ML model on CPU, GPU, and Neural Engine"
+requires-python = ">=3.11"
+dependencies = [
+  "click>=8.1",
+  "coremltools>=8.0",
+  "numpy>=2.0",
+  "torch>=2.2",
+  "torchvision>=0.17",
+]
+
+[project.scripts]
+inference-bench = "benchmark.cli:cli"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["benchmark*"]

@@ -1,0 +1,103 @@
+{
+  "accuracy_evaluated": false,
+  "comparison": "same compiled mlprogram loaded with cpuOnly, cpuAndGPU, and cpuAndNeuralEngine",
+  "created_at": "20260926T195525Z",
+  "energy_collected": false,
+  "energy_reason": "powermetrics requires sudo and was not sampled",
+  "failures": [],
+  "inter_session_pause_seconds": 2.0,
+  "machine": {
+    "architecture": "arm64",
+    "chip": "Apple M4 Pro",
+    "cpu": {
+      "cpu_cores": 12,
+      "efficiency_cores": 4,
+      "performance_cores": 8
+    },
+    "cpu_raw": "proc 12:8:4",
+    "gpu_cores": 16,
+    "low_power_mode": false,
+    "machine_name": "MacBook Pro",
+    "memory": "24 GB",
+    "metal": "spdisplays_metal3",
+    "model_identifier": "Mac16,8",
+    "model_number": "MX2H3LL/A",
+    "os": {
+      "build": "24E263",
+      "product": "macOS",
+      "version": "15.4.1"
+    },
+    "power_mode": "automatic",
+    "power_source": "battery"
+  },
+  "measured_iterations": 100,
+  "models": [
+    {
+      "batch": 1,
+      "compiled_model_sha256": "447e51ee7300aa916bfc3ca0000821618728d6b1526b80501232d890fa1d1b88",
+      "model": "mobilenet_v2",
+      "path": "build/models/mobilenet_v2-float16-b1.mlmodelc",
+      "precision": "float16"
+    },
+    {
+      "batch": 8,
+      "compiled_model_sha256": "4c96da97decf2f80a1fd36582100d51762f9c06e943d63d59a1a794cf2af3e83",
+      "model": "mobilenet_v2",
+      "path": "build/models/mobilenet_v2-float16-b8.mlmodelc",
+      "precision": "float16"
+    },
+    {
+      "batch": 1,
+      "compiled_model_sha256": "194ab9d9a23301f59cfee4db3baf61a96b3451080051311658494c0e3bd993fc",
+      "model": "mobilenet_v2",
+      "path": "build/models/mobilenet_v2-float32-b1.mlmodelc",
+      "precision": "float32"
+    },
+    {
+      "batch": 8,
+      "compiled_model_sha256": "3f68aaf31fc1ea82e602e2036baf4dcb37a1584b2fe1d7ae499bc28e3e42582e",
+      "model": "mobilenet_v2",
+      "path": "build/models/mobilenet_v2-float32-b8.mlmodelc",
+      "precision": "float32"
+    },
+    {
+      "batch": 1,
+      "compiled_model_sha256": "70710755bc1361d9b1118d8cbf06df5ca16c13f69b8166f7f83fdcf26e42de02",
+      "model": "resnet50",
+      "path": "build/models/resnet50-float16-b1.mlmodelc",
+      "precision": "float16"
+    },
+    {
+      "batch": 8,
+      "compiled_model_sha256": "295033e71f2da88aec5949ca4bbad05683e897412c103cf2799629468fdc0bb8",
+      "model": "resnet50",
+      "path": "build/models/resnet50-float16-b8.mlmodelc",
+      "precision": "float16"
+    },
+    {
+      "batch": 1,
+      "compiled_model_sha256": "ac7d31e8151ebd5290bbb9d3f3620e54d9fdfc4ca4d234aab1db320afb579110",
+      "model": "resnet50",
+      "path": "build/models/resnet50-float32-b1.mlmodelc",
+      "precision": "float32"
+    },
+    {
+      "batch": 8,
+      "compiled_model_sha256": "ccaa8e2d8def98b4695b8ab42ce0ed15d3ecc8b354084385efa8679a878df75c",
+      "model": "resnet50",
+      "path": "build/models/resnet50-float32-b8.mlmodelc",
+      "precision": "float32"
+    }
+  ],
+  "packages": {
+    "coremltools": "9.0",
+    "numpy": "2.4.6",
+    "torch": "2.14.0",
+    "torchvision": "0.29.0"
+  },
+  "percentile_method": "linear_rank",
+  "placement_rule": "a device result matches the request when that device holds at least half of the compute-plan weight",
+  "runtime": "coreml",
+  "sessions": 3,
+  "warmup_iterations": 20
+}
