@@ -8,7 +8,7 @@ Parâmetros fixos estão em `protocol/experiments.yaml`.
 
 ## Primeira sessão no Mac
 
-Confirmar o chip antes de medir qualquer modelo. O experimento B vale quando Sobre este Mac mostra Apple M5, M5 Pro ou M5 Max. Um Mac Pro Intel não tem Neural Engine e sai do estudo.
+Confirmar o chip antes de medir qualquer modelo. A corrida registrada em 26 de setembro de 2026 usou um MacBook Pro com Apple M4 Pro. Esse chip tem Neural Engine e entra no estudo. Um Mac Intel não tem Neural Engine e sai.
 
 ```bash
 system_profiler SPHardwareDataType
@@ -26,7 +26,7 @@ sudo powermetrics -s cpu_power,gpu_power,ane_power -n 5 -i 1000
 
 A amostra precisa listar os três samplers. Se `ane_power` não existir, o Mac não fecha a métrica de energia do Neural Engine.
 
-Nesta geração a GPU também traz Neural Accelerator em cada núcleo, separado do Neural Engine de 16 núcleos. O manifesto registra os dois blocos. A corrida de GPU e a corrida de Neural Engine permanecem separadas.
+No M4 Pro medido, a GPU e o Neural Engine são blocos separados. Uma corrida só vale para o dispositivo que o plano de execução realmente usou. No float32 desta corrida, `cpuAndNeuralEngine` ficou na CPU e não entra como NPU.
 
 ## Regras das duas máquinas
 
@@ -102,4 +102,21 @@ As figuras saem desses arquivos. As quatro figuras de cada máquina:
 3. Joule por inferência, com a fonte da potência na legenda.
 4. Dispersão de latência por joule.
 
-Figura do Windows e figura do Mac ficam em painéis separados. O texto discute o comportamento de cada arquitetura dentro da sua máquina.
+Figura do Windows e figura do Mac ficam em painéis separados. O texto discute o comportamento de cada arquitetura dentro da sua máquina. O cruzamento entre máquinas usa o ganho contra a CPU da própria máquina, em `results/comparison/20260926/`.
+
+## Medição de 26 de setembro de 2026
+
+Isto é registro do que as duas corridas mostraram. Não é a conclusão do artigo.
+
+| Máquina | Condição que muda a leitura |
+|---|---|
+| Windows, Ryzen 9 7900X3D e RTX 4070 Ti | ONNX Runtime, FP32 com TF32 desligado, desktop, pausa de 60 s. Sem NPU. Energia só da placa. |
+| MacBook Pro M4 Pro, 24 GB | Core ML, na bateria, pausa de 2 s, sem `powermetrics`. Batch 1 e 8. |
+
+No Windows, em FP32 e batch 1, a mediana ficou em 3,04 ms na CPU e 2,38 ms na GPU para o MobileNetV2, e em 32,7 ms na CPU e 3,32 ms na GPU para o ResNet-50. A GPU discreta se separa da CPU quando o modelo pesa ou o batch sobe. O p95 da CPU no ResNet-50 passa de 80 ms. A máquina não estava isolada.
+
+No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o MobileNetV2 ficou em 1,91 ms na CPU, 1,06 ms na GPU e 0,36 ms no Neural Engine. O ResNet-50 ficou em 4,07 ms na CPU e 1,06 ms no Neural Engine. O pedido de GPU para o ResNet-50 em batch 1 ficou majoritariamente na CPU e foi descartado. Em float32 o Neural Engine não executou nenhum dos dois modelos.
+
+Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 5,3 vezes no MobileNetV2 e 3,8 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
+
+Energia da tomada e joule da CPU continuam sem medição. O Mac precisa de uma repetição na tomada antes que esses milissegundos sejam citados como a condição cheia do chip.

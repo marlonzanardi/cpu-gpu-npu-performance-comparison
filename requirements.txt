@@ -1,0 +1,6 @@
+numpy
+matplotlib
+pyyaml
+onnx
+onnxconverter-common
+onnxruntime-gpu[cuda,cudnn]

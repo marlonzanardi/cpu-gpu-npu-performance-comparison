@@ -1,8 +1,8 @@
 # Artigo base
 
-**Em construção.** Este texto é uma análise inicial. Nada aqui é definição do estudo: nem o problema, nem os objetivos, nem a fundamentação, nem o que será medido. Não há resultado experimental neste arquivo. O que estiver abaixo pode mudar.
+**Em construção.** Este texto é uma análise inicial. Nada aqui é definição do estudo: nem o problema, nem os objetivos, nem a fundamentação, nem a medição. A seção final registra a primeira corrida e também pode mudar.
 
-O registro operacional da medição, também sujeito a revisão, está em `protocol/measurement-protocol.md` e `protocol/experiments.yaml`.
+O registro operacional está em `protocol/measurement-protocol.md` e `protocol/experiments.yaml`. As figuras da primeira corrida estão no `README.md`.
 
 ---
 
@@ -236,3 +236,15 @@ A comparação também evidencia a importância do software no aproveitamento da
 Por essa razão, as diferenças apresentadas nesta seção devem ser entendidas como características arquiteturais e não como resultados experimentais. A verificação do desempenho efetivo de CPU, GPU e NPU será realizada posteriormente, utilizando modelos, condições de execução e métricas definidos na metodologia.
 
 A fundamentação apresentada até este ponto estabelece, portanto, a base necessária para a etapa experimental. Ao compreender as diferenças entre propósito geral, processamento paralelo e especialização em IA, torna-se possível interpretar de maneira mais adequada os resultados que serão obtidos durante os testes.
+
+## Medição inicial
+
+O que segue é a primeira corrida, feita em 26 de setembro de 2026. Não fecha a questão de pesquisa. Os números detalhados e as figuras estão no README.
+
+Foram medidas duas máquinas, com runtimes diferentes. Na workstation, ONNX Runtime comparou o Ryzen 9 7900X3D com a RTX 4070 Ti. Não há NPU nessa máquina. No MacBook Pro, Core ML comparou CPU, GPU e Neural Engine de um Apple M4 Pro. A corrida do Mac foi feita na bateria, sem amostragem de potência.
+
+Em FP32 e batch 1, na workstation, o MobileNetV2 ficou em 3,04 ms na CPU e 2,38 ms na GPU. O ResNet-50 ficou em 32,7 ms na CPU e 3,32 ms na GPU. A distância entre CPU e GPU cresce com o custo do modelo e com o batch.
+
+No M4 Pro, o Neural Engine executou os dois modelos em float16 e não os executou em float32. Em float16 e batch 1, o MobileNetV2 ficou em 1,91 ms na CPU, 1,06 ms na GPU e 0,36 ms no Neural Engine. O ResNet-50 ficou em 4,07 ms na CPU e 1,06 ms no Neural Engine. O pedido de GPU para esse ResNet-50 em batch 1 permaneceu majoritariamente na CPU e não entra como resultado de GPU.
+
+O cruzamento entre as máquinas usa o ganho de cada acelerador contra a CPU do mesmo computador, na mesma precisão. Ele não ordena o Neural Engine e a RTX 4070 Ti num mesmo eixo de tempo. Eficiência energética ainda não foi comparada: a workstation só tem a potência da placa, e o Mac não tem `powermetrics`.

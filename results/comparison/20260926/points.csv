@@ -1,0 +1,43 @@
+machine,model,device,precision,batch,valid,latency_ms,p95_ms,throughput,energy_j
+Windows workstation,mobilenet_v2,CPU,fp32,1,True,3.04215,13.882855,218.1345266176364,
+Windows workstation,mobilenet_v2,CPU,fp32,8,True,40.34035,82.611145,192.78312979898504,
+Windows workstation,mobilenet_v2,CPU,fp32,32,True,166.64515,253.63450999999992,184.59839623797285,
+Windows workstation,mobilenet_v2,CUDA,fp32,1,True,2.3788,3.3248,409.84983921284686,0.15637938932447362
+Windows workstation,mobilenet_v2,CUDA,fp32,8,True,3.18195,4.3229999999999995,2440.2534447066528,0.4418239352210339
+Windows workstation,mobilenet_v2,CUDA,fp32,32,True,12.604700000000001,14.8505,2495.206474433427,2.2098184927493043
+Windows workstation,mobilenet_v2,CUDA,fp16,1,True,1.7762,2.51027,536.5394066738903,0.15658666195969226
+Windows workstation,mobilenet_v2,CUDA,fp16,8,True,2.4396,3.4575649999999998,3067.450553695247,0.363445392695397
+Windows workstation,mobilenet_v2,CUDA,fp16,32,True,6.9843,8.04345,4536.431300064019,1.3892254842899778
+Windows workstation,resnet50,CPU,fp32,1,True,32.7059,80.05160999999998,25.01684759601978,
+Windows workstation,resnet50,CPU,fp32,8,True,161.2202,341.66355,42.638749996865656,
+Windows workstation,resnet50,CPU,fp32,32,True,599.6367,789.12501,52.99323037647347,
+Windows workstation,resnet50,CUDA,fp32,1,True,3.3153,4.472734999999999,292.5085917095978,0.34079080540501394
+Windows workstation,resnet50,CUDA,fp32,8,True,7.6185,9.034144999999999,1030.7535633147545,1.711950222203341
+Windows workstation,resnet50,CUDA,fp32,32,True,33.342150000000004,35.29723,963.0164371258116,7.087430968122789
+Windows workstation,resnet50,CUDA,fp16,1,True,4.02265,5.326365,238.09399093598074,0.5907400578440427
+Windows workstation,resnet50,CUDA,fp16,8,True,7.4765,8.839435,1052.338585733371,1.6109232331438044
+Windows workstation,resnet50,CUDA,fp16,32,True,21.97085,24.069374999999997,1449.5684272392648,5.256187528877003
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,1,True,1.059708,1.210176,943.656177,
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,1,True,0.363645,0.402854,2749.930908,
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,1,True,1.91077,2.023667,523.349089,
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,8,True,2.976375,3.177894,2687.833354,
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,8,True,2.707437,2.751835,2954.824064,
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,8,True,13.088833,13.409986,611.208019,
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,1,True,1.255333,1.518818,796.601063,
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,1,False,3.060104,3.363742,326.786279,
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,1,True,2.976541,3.138171,335.960375,
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,8,True,3.378958,3.577373,2367.593446,
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,8,False,20.761646,21.179735,385.325903,
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,8,True,20.729834,21.251824,385.917224,
+MacBook Pro M4 Pro,resnet50,GPU,fp16,1,False,3.114875,3.28473,321.04017,
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,1,True,1.06,1.40839,943.396226,
+MacBook Pro M4 Pro,resnet50,CPU,fp16,1,True,4.072854,4.209214,245.528074,
+MacBook Pro M4 Pro,resnet50,GPU,fp16,8,True,15.175479,15.375133,527.166227,
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,8,True,8.456312,8.560446,946.038832,
+MacBook Pro M4 Pro,resnet50,CPU,fp16,8,True,20.043625,20.409502,399.129399,
+MacBook Pro M4 Pro,resnet50,GPU,fp32,1,False,6.79725,11.717495,147.11832,
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,1,False,7.989771,8.168104,125.160041,
+MacBook Pro M4 Pro,resnet50,CPU,fp32,1,True,7.998083,8.185016,125.02996,
+MacBook Pro M4 Pro,resnet50,GPU,fp32,8,True,19.393876,19.727127,412.501359,
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,8,False,43.970562,50.909105,181.939906,
+MacBook Pro M4 Pro,resnet50,CPU,fp32,8,True,45.010541,51.963636,177.736144,

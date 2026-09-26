@@ -1,0 +1,28 @@
+{
+  "torch": "2.14.0+cpu",
+  "torchvision": "0.29.0+cpu",
+  "models": {
+    "mobilenet_v2": {
+      "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
+      "fp32": {
+        "path": "mobilenet_v2-fp32.onnx",
+        "sha256": "e938a7bac33071015439c5419f74813ebe9b0abbccac0568b2e11d99451734b6"
+      },
+      "fp16": {
+        "path": "mobilenet_v2-fp16.onnx",
+        "sha256": "7b924a4fd3a94e30c3c78bec26a480986a0e5f1bba4d6e87051a7ebc9c310beb"
+      }
+    },
+    "resnet50": {
+      "weights": "ResNet50_Weights.IMAGENET1K_V2",
+      "fp32": {
+        "path": "resnet50-fp32.onnx",
+        "sha256": "d2058db5bda20b0b1ce09a8ba0726d3b6c60cf811e7a39e9a4db5da207b2eea9"
+      },
+      "fp16": {
+        "path": "resnet50-fp16.onnx",
+        "sha256": "92ae4d7488c3642ab1f2f231b6b4cd744d19ab454ec925d19f7e290555acb597"
+      }
+    }
+  }
+}

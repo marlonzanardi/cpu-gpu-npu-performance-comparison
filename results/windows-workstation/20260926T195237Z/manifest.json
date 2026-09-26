@@ -1,0 +1,80 @@
+{
+  "study": "cpu-gpu-npu-inference",
+  "experiment": "A",
+  "machine_id": "windows-workstation",
+  "mode": "full",
+  "status": "completed",
+  "started_utc": "20260926T195237Z",
+  "runtime": "onnxruntime",
+  "scope": "inference",
+  "precision_iso": "fp32",
+  "cuda_use_tf32": false,
+  "vendor_precision": "fp16",
+  "latency_includes": "host_to_device_compute_device_to_host",
+  "cpu_energy": "not_measured",
+  "gpu_energy": "nvidia-smi board power averaged over a sustained repeat of the same inference, at least 3 seconds, times that window, divided by inferences in the window. The latency sample stays on the protocol iterations and does not include the power sampler.",
+  "gpu_clocks": "not locked",
+  "warmup_iterations": 20,
+  "measured_iterations": 100,
+  "sessions": 3,
+  "session_gap_s": 60,
+  "batches": [
+    1,
+    8,
+    32
+  ],
+  "input_seed_rule": "adler32(model|precision|batch), reused across sessions and devices",
+  "intra_op_threads_cpu": 24,
+  "hardware": {
+    "hostname": "Marlon-Zanardi",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "processor": "AMD64 Family 25 Model 97 Stepping 2, AuthenticAMD",
+    "logical_cpus": 24,
+    "gpu_name": "NVIDIA GeForce RTX 4070 Ti",
+    "gpu_memory_mib": 12282.0,
+    "nvidia_driver": "581.42",
+    "python": "3.11.4",
+    "numpy": "2.4.6",
+    "onnx": "1.23.0",
+    "onnxruntime": "1.30.0",
+    "available_providers": [
+      "TensorrtExecutionProvider",
+      "CUDAExecutionProvider",
+      "CPUExecutionProvider"
+    ],
+    "excluded_devices": [
+      "amd_radeon_igpu"
+    ],
+    "npu": "unavailable"
+  },
+  "models": {
+    "torch": "2.14.0+cpu",
+    "torchvision": "0.29.0+cpu",
+    "models": {
+      "mobilenet_v2": {
+        "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
+        "fp32": {
+          "path": "mobilenet_v2-fp32.onnx",
+          "sha256": "e938a7bac33071015439c5419f74813ebe9b0abbccac0568b2e11d99451734b6"
+        },
+        "fp16": {
+          "path": "mobilenet_v2-fp16.onnx",
+          "sha256": "7b924a4fd3a94e30c3c78bec26a480986a0e5f1bba4d6e87051a7ebc9c310beb"
+        }
+      },
+      "resnet50": {
+        "weights": "ResNet50_Weights.IMAGENET1K_V2",
+        "fp32": {
+          "path": "resnet50-fp32.onnx",
+          "sha256": "d2058db5bda20b0b1ce09a8ba0726d3b6c60cf811e7a39e9a4db5da207b2eea9"
+        },
+        "fp16": {
+          "path": "resnet50-fp16.onnx",
+          "sha256": "92ae4d7488c3642ab1f2f231b6b4cd744d19ab454ec925d19f7e290555acb597"
+        }
+      }
+    }
+  },
+  "protocol": "protocol/experiments.yaml",
+  "finished_utc": "20260926T200335Z"
+}
