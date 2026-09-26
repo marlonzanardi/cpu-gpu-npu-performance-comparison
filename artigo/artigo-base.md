@@ -241,10 +241,10 @@ A fundamentação apresentada até este ponto estabelece, portanto, a base neces
 
 O que segue é a primeira corrida, feita em 26 de setembro de 2026. Não fecha a questão de pesquisa. Os números detalhados e as figuras estão no README.
 
-Foram medidas duas máquinas, com runtimes diferentes. Na workstation, ONNX Runtime comparou o Ryzen 9 7900X3D com a RTX 4070 Ti. Não há NPU nessa máquina. No MacBook Pro, Core ML comparou CPU, GPU e Neural Engine de um Apple M4 Pro. A corrida do Mac foi feita na bateria, sem amostragem de potência.
+Foram medidas duas máquinas, com runtimes diferentes. Na workstation, ONNX Runtime comparou o Ryzen 9 7900X3D com a RTX 4070 Ti. Não há NPU nessa máquina. No MacBook Pro, Core ML comparou CPU, GPU e Neural Engine de um Apple M4 Pro. A sessão citada do Mac foi feita na tomada, sem amostragem de potência.
 
 Em FP32 e batch 1, na workstation, o MobileNetV2 ficou em 3,04 ms na CPU e 2,38 ms na GPU. O ResNet-50 ficou em 32,7 ms na CPU e 3,32 ms na GPU. A distância entre CPU e GPU cresce com o custo do modelo e com o batch.
 
-No M4 Pro, o Neural Engine executou os dois modelos em float16 e não os executou em float32. Em float16 e batch 1, o MobileNetV2 ficou em 1,91 ms na CPU, 1,06 ms na GPU e 0,36 ms no Neural Engine. O ResNet-50 ficou em 4,07 ms na CPU e 1,06 ms no Neural Engine. O pedido de GPU para esse ResNet-50 em batch 1 permaneceu majoritariamente na CPU e não entra como resultado de GPU.
+No M4 Pro, o Neural Engine executou os dois modelos em float16 e não os executou em float32. Em float16 e batch 1, o MobileNetV2 ficou em 1,96 ms na CPU, 0,93 ms na GPU e 0,38 ms no Neural Engine. O ResNet-50 ficou em 4,13 ms na CPU e 1,05 ms no Neural Engine. O pedido de GPU para esse ResNet-50 em batch 1 permaneceu majoritariamente na CPU e não entra como resultado de GPU.
 
 O cruzamento entre as máquinas usa o ganho de cada acelerador contra a CPU do mesmo computador, na mesma precisão. Ele não ordena o Neural Engine e a RTX 4070 Ti num mesmo eixo de tempo. Eficiência energética ainda não foi comparada: a workstation só tem a potência da placa, e o Mac não tem `powermetrics`.

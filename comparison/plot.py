@@ -11,7 +11,7 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 WINDOWS_SUMMARY = ROOT / "results" / "windows-workstation" / "20260926T195237Z" / "summary.csv"
-MAC_SUMMARY = ROOT / "results" / "apple-m4-pro" / "20260926T195525Z" / "summary.csv"
+MAC_SUMMARY = ROOT / "results" / "apple-m4-pro" / "20260926T200938Z" / "summary.csv"
 OUT = ROOT / "results" / "comparison" / "20260926"
 
 MODEL_LABELS = {"mobilenet_v2": "MobileNetV2", "resnet50": "ResNet-50"}

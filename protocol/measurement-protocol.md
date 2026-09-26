@@ -111,12 +111,12 @@ Isto é registro do que as duas corridas mostraram. Não é a conclusão do arti
 | Máquina | Condição que muda a leitura |
 |---|---|
 | Windows, Ryzen 9 7900X3D e RTX 4070 Ti | ONNX Runtime, FP32 com TF32 desligado, desktop, pausa de 60 s. Sem NPU. Energia só da placa. |
-| MacBook Pro M4 Pro, 24 GB | Core ML, na bateria, pausa de 2 s, sem `powermetrics`. Batch 1 e 8. |
+| MacBook Pro M4 Pro, 24 GB | Core ML, na tomada, pausa de 2 s, sem `powermetrics`. Batch 1 e 8. |
 
 No Windows, em FP32 e batch 1, a mediana ficou em 3,04 ms na CPU e 2,38 ms na GPU para o MobileNetV2, e em 32,7 ms na CPU e 3,32 ms na GPU para o ResNet-50. A GPU discreta se separa da CPU quando o modelo pesa ou o batch sobe. O p95 da CPU no ResNet-50 passa de 80 ms. A máquina não estava isolada.
 
-No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o MobileNetV2 ficou em 1,91 ms na CPU, 1,06 ms na GPU e 0,36 ms no Neural Engine. O ResNet-50 ficou em 4,07 ms na CPU e 1,06 ms no Neural Engine. O pedido de GPU para o ResNet-50 em batch 1 ficou majoritariamente na CPU e foi descartado. Em float32 o Neural Engine não executou nenhum dos dois modelos.
+No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o MobileNetV2 ficou em 1,96 ms na CPU, 0,93 ms na GPU e 0,38 ms no Neural Engine. O ResNet-50 ficou em 4,13 ms na CPU e 1,05 ms no Neural Engine. O pedido de GPU para o ResNet-50 em batch 1 ficou majoritariamente na CPU e foi descartado. Em float32 o Neural Engine não executou nenhum dos dois modelos.
 
-Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 5,3 vezes no MobileNetV2 e 3,8 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
+Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 5,1 vezes no MobileNetV2 e 3,9 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
 
-Energia da tomada e joule da CPU continuam sem medição. O Mac precisa de uma repetição na tomada antes que esses milissegundos sejam citados como a condição cheia do chip.
+Energia da tomada e joule da CPU continuam sem medição. A sessão citada do Mac foi na tomada. A pausa entre sessões foi de 2 segundos, então o chip não voltou ao idle térmico entre elas.
