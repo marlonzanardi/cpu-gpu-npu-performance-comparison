@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import platform
 from pathlib import Path
 
 import numpy as np
@@ -9,7 +10,9 @@ import numpy as np
 
 def _deployment_target(coremltools: object) -> object:
     target = coremltools.target
-    if hasattr(target, "macOS15"):
+    version = platform.mac_ver()[0]
+    major = int(version.split(".")[0]) if version else 0
+    if major >= 15 and hasattr(target, "macOS15"):
         return target.macOS15
     return target.macOS14
 

@@ -17,27 +17,51 @@ Windows workstation,resnet50,CUDA,fp32,32,True,33.342150000000004,35.29723,963.0
 Windows workstation,resnet50,CUDA,fp16,1,True,4.02265,5.326365,238.09399093598074,0.5907400578440427
 Windows workstation,resnet50,CUDA,fp16,8,True,7.4765,8.839435,1052.338585733371,1.6109232331438044
 Windows workstation,resnet50,CUDA,fp16,32,True,21.97085,24.069374999999997,1449.5684272392648,5.256187528877003
-MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,1,True,0.871,1.034484,1148.105626,
-MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,1,True,0.425001,0.507456,2352.938408,
-MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,1,True,2.065229,2.250957,484.207805,
-MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,8,True,3.050459,3.199896,2622.556576,
-MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,8,True,2.766625,2.809688,2891.609813,
-MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,8,True,14.253396,14.555233,561.269749,
-MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,1,True,1.07975,1.234354,926.14031,
-MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,1,False,3.257812,3.494405,306.954484,
-MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,1,True,3.276125,3.497444,305.238658,
-MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,8,True,3.42225,3.664935,2337.643363,
-MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,8,False,21.864146,22.182429,365.895837,
-MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,8,True,21.891312,22.146373,365.441771,
-MacBook Pro M4 Pro,resnet50,GPU,fp16,1,False,3.117126,3.229933,320.808386,
-MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,1,True,1.005167,1.039929,994.860056,
-MacBook Pro M4 Pro,resnet50,CPU,fp16,1,True,4.150792,4.277852,240.917878,
-MacBook Pro M4 Pro,resnet50,GPU,fp16,8,True,15.033917,15.241471,532.130116,
-MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,8,True,8.391083,8.751512,953.393024,
-MacBook Pro M4 Pro,resnet50,CPU,fp16,8,True,20.649979,21.074023,387.409595,
-MacBook Pro M4 Pro,resnet50,GPU,fp32,1,False,6.807563,11.088249,146.895446,
-MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,1,False,8.084479,8.248698,123.693809,
-MacBook Pro M4 Pro,resnet50,CPU,fp32,1,True,8.101958,8.303833,123.426954,
-MacBook Pro M4 Pro,resnet50,GPU,fp32,8,True,19.384,19.716604,412.711515,
-MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,8,False,48.32325,58.327665,165.551779,
-MacBook Pro M4 Pro,resnet50,CPU,fp32,8,True,48.287084,57.878052,165.675775,
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,1,True,0.871,1.034484,1148.105626,0.0112
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,1,True,0.425001,0.507456,2352.938408,0.001773
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,1,True,2.065229,2.250957,484.207805,0.013011
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp16,8,True,3.050459,3.199896,2622.556576,0.059041
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp16,8,True,2.766625,2.809688,2891.609813,0.010273
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp16,8,True,14.253396,14.555233,561.269749,0.108947
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,1,True,1.07975,1.234354,926.14031,0.013004
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,1,False,3.257812,3.494405,306.954484,0.020492
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,1,True,3.276125,3.497444,305.238658,0.020597
+MacBook Pro M4 Pro,mobilenet_v2,GPU,fp32,8,True,3.42225,3.664935,2337.643363,0.057466
+MacBook Pro M4 Pro,mobilenet_v2,Neural Engine,fp32,8,False,21.864146,22.182429,365.895837,0.161011
+MacBook Pro M4 Pro,mobilenet_v2,CPU,fp32,8,True,21.891312,22.146373,365.441771,0.152986
+MacBook Pro M4 Pro,resnet50,GPU,fp16,1,False,3.117126,3.229933,320.808386,0.042359
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,1,True,1.005167,1.039929,994.860056,0.005104
+MacBook Pro M4 Pro,resnet50,CPU,fp16,1,True,4.150792,4.277852,240.917878,0.028516
+MacBook Pro M4 Pro,resnet50,GPU,fp16,8,True,15.033917,15.241471,532.130116,0.320563
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp16,8,True,8.391083,8.751512,953.393024,0.046131
+MacBook Pro M4 Pro,resnet50,CPU,fp16,8,True,20.649979,21.074023,387.409595,0.158086
+MacBook Pro M4 Pro,resnet50,GPU,fp32,1,False,6.807563,11.088249,146.895446,0.042075
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,1,False,8.084479,8.248698,123.693809,0.059334
+MacBook Pro M4 Pro,resnet50,CPU,fp32,1,True,8.101958,8.303833,123.426954,0.055082
+MacBook Pro M4 Pro,resnet50,GPU,fp32,8,True,19.384,19.716604,412.711515,0.315284
+MacBook Pro M4 Pro,resnet50,Neural Engine,fp32,8,False,48.32325,58.327665,165.551779,0.352894
+MacBook Pro M4 Pro,resnet50,CPU,fp32,8,True,48.287084,57.878052,165.675775,0.383822
+MacBook Pro M1,mobilenet_v2,GPU,fp16,1,True,2.569333,2.991514,389.205994,0.00715
+MacBook Pro M1,mobilenet_v2,Neural Engine,fp16,1,True,0.626292,0.648706,1596.699303,0.001857
+MacBook Pro M1,mobilenet_v2,CPU,fp16,1,True,2.846979,2.989042,351.249517,0.016671
+MacBook Pro M1,mobilenet_v2,GPU,fp16,8,True,9.540667,9.843465,838.515842,0.07771
+MacBook Pro M1,mobilenet_v2,Neural Engine,fp16,8,True,3.948374,4.067978,2026.150255,0.01535
+MacBook Pro M1,mobilenet_v2,CPU,fp16,8,True,21.213146,22.588183,377.124638,0.131208
+MacBook Pro M1,mobilenet_v2,GPU,fp32,1,True,2.748291,3.04323,363.862421,0.007862
+MacBook Pro M1,mobilenet_v2,Neural Engine,fp32,1,False,5.860812,6.089985,170.624807,0.033262
+MacBook Pro M1,mobilenet_v2,CPU,fp32,1,True,4.48598,4.556127,222.916757,0.028428
+MacBook Pro M1,mobilenet_v2,GPU,fp32,8,True,12.2305,12.701237,654.102449,0.091208
+MacBook Pro M1,mobilenet_v2,Neural Engine,fp32,8,False,38.952334,39.638609,205.379223,0.245274
+MacBook Pro M1,mobilenet_v2,CPU,fp32,8,True,34.057083,34.469081,234.899742,0.227196
+MacBook Pro M1,resnet50,GPU,fp16,1,True,7.208208,7.545196,138.730736,0.060378
+MacBook Pro M1,resnet50,Neural Engine,fp16,1,True,1.807667,2.117429,553.199234,0.006824
+MacBook Pro M1,resnet50,CPU,fp16,1,True,7.104021,7.63322,140.76535,0.046665
+MacBook Pro M1,resnet50,GPU,fp16,8,True,41.907291,42.224769,190.897567,0.433647
+MacBook Pro M1,resnet50,Neural Engine,fp16,8,True,13.913562,14.1875,574.978551,0.059873
+MacBook Pro M1,resnet50,CPU,fp16,8,True,55.796437,56.611627,143.378331,0.366341
+MacBook Pro M1,resnet50,GPU,fp32,1,True,8.539813,9.003159,117.098583,0.069544
+MacBook Pro M1,resnet50,Neural Engine,fp32,1,False,17.661958,18.120065,56.618864,0.11832
+MacBook Pro M1,resnet50,CPU,fp32,1,True,12.788417,13.176133,78.195761,0.09652
+MacBook Pro M1,resnet50,GPU,fp32,8,True,53.925584,54.71033,148.35259,0.528329
+MacBook Pro M1,resnet50,Neural Engine,fp32,8,False,122.007083,123.352662,65.569964,0.815161
+MacBook Pro M1,resnet50,CPU,fp32,8,True,114.256438,121.002265,70.017937,0.799417

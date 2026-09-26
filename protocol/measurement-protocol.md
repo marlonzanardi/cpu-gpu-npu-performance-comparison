@@ -112,6 +112,7 @@ Isto é registro do que as duas corridas mostraram. Não é a conclusão do arti
 |---|---|
 | Windows, Ryzen 9 7900X3D e RTX 4070 Ti | ONNX Runtime, FP32 com TF32 desligado, desktop, pausa de 60 s. Sem NPU. Energia só da placa. |
 | MacBook Pro M4 Pro, 24 GB | Core ML, na tomada, pausa de 60 s, `powermetrics` nos três trilhos. Batch 1 e 8. Modelo carregado do ONNX FP32. |
+| MacBook Pro M1, 16 GB | Core ML no macOS 14.8.9, na tomada, pausa de 60 s, `powermetrics`. Manifesto separado: o MobileNetV2 não usa o ONNX `IMAGENET1K_V2` da sessão do M4 Pro. |
 
 No Windows, em FP32 e batch 1, a mediana ficou em 3,04 ms na CPU e 2,38 ms na GPU para o MobileNetV2, e em 32,7 ms na CPU e 3,32 ms na GPU para o ResNet-50. A GPU discreta se separa da CPU quando o modelo pesa ou o batch sobe. O p95 da CPU no ResNet-50 passa de 80 ms. A máquina não estava isolada.
 

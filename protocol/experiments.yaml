@@ -5,6 +5,7 @@ recorded_on: 2026-09-26
 recorded_runs:
   - results/windows-workstation/20260926T195237Z
   - results/apple-m4-pro/20260926T204025Z
+  - results/apple-m1/20260926T203102Z
 
 models:
   - id: mobilenet_v2

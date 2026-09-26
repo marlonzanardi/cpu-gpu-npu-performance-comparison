@@ -24,7 +24,7 @@ Este manuscrito responde uma pergunta menor, que os registros fecham:
 
 Como CPU, GPU e, quando o plano de execução confirma o acelerador, o Neural Engine se comportam na inferência de MobileNetV2 e ResNet-50, se o tempo de uma máquina não entra no eixo da outra?
 
-A eficiência energética permanece como motivação e como lacuna. A única série de joule é a potência de bordo da RTX 4070 Ti.
+A eficiência energética permanece sem uma grandeza comum entre as máquinas. A workstation tem joule de placa. O M4 Pro tem a soma estimada dos trilhos do chip. As duas contas não se subtraem.
 
 ### 1.1 Objetivos
 
@@ -187,6 +187,7 @@ Uma submissão que ignore os itens abaixo afirma mais do que o registro.
 - O joule do Mac soma três trilhos estimados. O joule da workstation é só a placa. Nenhum dos dois mede a tomada, e o pacote do Ryzen continua de fora.
 - O pedido de GPU no MobileNetV2 em float16 e batch 1, na sessão completa, não teve o aquecimento de 20 iterações marcado como estável. Uma repetição só dessa linha, com 80 iterações de aquecimento, na tomada e com pausa de 60 s, estabilizou em 0,86 ms (`results/apple-m4-pro/20260926T221801Z`). A mediana citada de 0,87 ms permanece.
 - O p95 da CPU da workstation no ResNet-50 é largo. Ele não deve ser citado como latência do processador.
+- Existe uma sessão no MacBook Pro M1 (`results/apple-m1/20260926T203102Z`), na tomada e com `powermetrics`. Ela confirma fallback em float32 e o trilho do Neural Engine em float16. O MobileNetV2 dessa sessão não é o ONNX `IMAGENET1K_V2` da sessão do M4 Pro, e o opset é o do macOS 14. Ela não entra nas figuras 1 a 4.
 
 ## 7. Conclusão
 

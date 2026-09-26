@@ -12,6 +12,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 WINDOWS_SUMMARY = ROOT / "results" / "windows-workstation" / "20260926T195237Z" / "summary.csv"
 MAC_SUMMARY = ROOT / "results" / "apple-m4-pro" / "20260926T204025Z" / "summary.csv"
+M1_SUMMARY = ROOT / "results" / "apple-m1" / "20260926T203102Z" / "summary.csv"
 OUT = ROOT / "results" / "comparison" / "20260926"
 
 MODEL_LABELS = {"mobilenet_v2": "MobileNetV2", "resnet50": "ResNet-50"}
@@ -47,21 +48,46 @@ def load_windows():
     return points
 
 
-def load_mac():
+def _optional_float(value):
+    if value is None or value == "":
+        return None
+    return float(value)
+
+
+def _energy(row):
+    for key in ("energy_j_per_inference", "combined_j_per_inference"):
+        value = _optional_float(row.get(key))
+        if value is not None:
+            return value
+    return None
+
+
+def _valid(row, device):
+    placed = row["placement_matches_request"] == "True"
+    if device != "Neural Engine":
+        return placed
+    flag = row.get("ane_above_other_runs") or row.get("ane_above_idle") or ""
+    if flag == "":
+        return placed
+    return placed and flag == "True"
+
+
+def load_coreml(path, machine):
     points = []
-    with MAC_SUMMARY.open(encoding="utf-8", newline="") as handle:
+    with path.open(encoding="utf-8", newline="") as handle:
         for row in csv.DictReader(handle):
+            device = MAC_DEVICES[row["compute_units"]]
             points.append({
-                "machine": "MacBook Pro M4 Pro",
+                "machine": machine,
                 "model": row["model"],
-                "device": MAC_DEVICES[row["compute_units"]],
+                "device": device,
                 "precision": "fp16" if row["precision"] == "float16" else "fp32",
                 "batch": int(row["batch"]),
                 "latency_ms": float(row["median_ms"]),
                 "p95_ms": float(row["p95_ms"]),
                 "throughput": float(row["throughput_per_s"]),
-                "energy_j": None,
-                "valid": row["placement_matches_request"] == "True",
+                "energy_j": _energy(row),
+                "valid": _valid(row, device),
             })
     return points
 
@@ -205,24 +231,49 @@ def plot_energy(windows, path):
     plt.close(figure)
 
 
-def write_table(windows, mac, path):
+def plot_m1(m1, path):
+    figure, axes = plt.subplots(1, 2, figsize=(11, 4.6))
+    grouped_bars(axes[0], pick(m1, precision="fp16", batch=1), ("CPU", "GPU", "Neural Engine"), MODELS)
+    axes[0].set_title("Latency, float16, batch 1")
+    axes[0].set_ylabel("Median latency (ms)")
+    positions = np.arange(len(MODELS))
+    width = 0.24
+    for index, device in enumerate(("CPU", "GPU", "Neural Engine")):
+        heights = []
+        for model in MODELS:
+            point = one(m1, model=model, device=device, precision="fp16", batch=1)
+            heights.append(point["energy_j"] if point and point["energy_j"] is not None else np.nan)
+        axes[1].bar(positions + (index - 1) * width, heights, width, label=device, color=COLORS[device])
+    axes[1].set_xticks(positions, [MODEL_LABELS[model] for model in MODELS])
+    axes[1].set_ylabel("Joules per inference")
+    axes[1].set_title("Chip rails, float16, batch 1")
+    axes[1].legend(frameon=False)
+    figure.suptitle("M1 on AC power. Separate manifest from the M4 Pro ONNX session.")
+    figure.tight_layout()
+    figure.savefig(path, dpi=140)
+    plt.close(figure)
+
+
+def write_table(windows, mac, m1, path):
     fields = ["machine", "model", "device", "precision", "batch", "valid", "latency_ms", "p95_ms", "throughput", "energy_j"]
     with path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fields, extrasaction="ignore")
         writer.writeheader()
-        for point in windows + mac:
+        for point in windows + mac + m1:
             writer.writerow(point)
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     windows = load_windows()
-    mac = load_mac()
+    mac = load_coreml(MAC_SUMMARY, "MacBook Pro M4 Pro")
+    m1 = load_coreml(M1_SUMMARY, "MacBook Pro M1")
     plot_latency(windows, mac, OUT / "latency_within_machine.png")
     plot_throughput(windows, mac, OUT / "throughput_within_machine.png")
     plot_speedup(windows, mac, OUT / "speedup_vs_same_machine_cpu.png")
     plot_energy(windows, OUT / "energy_cuda_per_image.png")
-    write_table(windows, mac, OUT / "points.csv")
+    plot_m1(m1, OUT / "m1_ac_session.png")
+    write_table(windows, mac, m1, OUT / "points.csv")
     print(OUT)
 
 

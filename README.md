@@ -14,7 +14,7 @@ Cada máquina tem o próprio manifesto. O tempo de uma não entra no eixo da out
 | NPU | ausente | Neural Engine de 16 núcleos |
 | Runtime | ONNX Runtime 1.30 | Core ML, coremltools 9.0 |
 | Precisão da coluna principal | FP32, TF32 desligado na GPU | float16 para a corrida em que o Neural Engine executou |
-| Energia | potência de bordo da placa | não medida |
+| Energia | potência de bordo da placa | trilhos estimados do chip |
 | Alimentação | desktop | tomada, bateria carregada, modo automático |
 | Evidência | `results/windows-workstation/20260926T195237Z` | `results/apple-m4-pro/20260926T204025Z` |
 
@@ -69,10 +69,19 @@ Só a RTX 4070 Ti tem joule de placa, e é potência de bordo, não da tomada. O
 
 No batch 1 a placa gasta mais joule por imagem porque a potência de bordo se divide por pouco trabalho. No ResNet-50 em FP32, o custo cai de 0,34 J no batch 1 para cerca de 0,22 J no batch 32, com a placa acima de 200 W. Em float16 e batch 1 o ResNet-50 ficou mais lento que em FP32 e, por isso, mais caro por imagem. Precisão menor não ganhou sozinha.
 
+## M1, manifesto separado
+
+`results/apple-m1/20260926T203102Z` é um MacBook Pro M1, 16 GB, macOS 14.8.9, na tomada, com pausa de 60 s e `powermetrics`. Em float16 e batch 1 o Neural Engine executou: 0,63 ms e 0,0019 J no MobileNetV2, 1,81 ms e 0,0068 J no ResNet-50. O trilho ANE ficou em cerca de 1,9 W e 3,5 W nessas corridas e em 0 W na CPU e na GPU. Em float32 o plano ficou na CPU.
+
+Essa sessão não entra nas figuras do M4 Pro. O MobileNetV2 dela saiu do traço torchvision `IMAGENET1K_V1`, não do ONNX `IMAGENET1K_V2` da sessão citada. O opset é o do macOS 14. A janela de energia foi de 4 s. O ResNet-50 usou `IMAGENET1K_V2`, mas o programa compilado não é o do M4 Pro.
+
+![Sessão do M1 na tomada](results/comparison/20260926/m1_ac_session.png)
+
 ## O que esta corrida não sustenta
 
 - Ordenar Neural Engine, RTX 4070 Ti e Ryzen num único gráfico de milissegundos.
-- Tratar float32 do M4 Pro como teste de NPU. O plano ficou na CPU.
+- Tratar float32 do M4 Pro ou do M1 como teste de NPU. O plano ficou na CPU.
+- Tratar a sessão do M1 como repetição do M4 Pro. O chip, o macOS e o checkpoint do MobileNetV2 são outros.
 - Concluir eficiência entre as máquinas. O joule da 4070 Ti é potência de placa. O joule do M4 Pro é estimativa dos trilhos do chip. Nenhum dos dois é a tomada, e o pacote do Ryzen continua de fora.
 - Tratar o arquivo ONNX do Mac como cópia byte a byte do arquivo da workstation. O exportador e os nomes dos pesos são os mesmos. O SHA-256 não coincidiu.
 - Tratar o 0,87 ms da GPU no MobileNetV2 em batch 1 como um número sem checagem. Na sessão completa o aquecimento de 20 iterações não foi marcado como estável. Uma repetição com 80 iterações, na tomada, estabilizou em 0,86 ms.
