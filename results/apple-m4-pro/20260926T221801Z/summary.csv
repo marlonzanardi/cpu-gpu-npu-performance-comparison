@@ -1,0 +1,4 @@
+model,precision,batch,compute_units,placement_matches_request,dominant_device,dominant_weight_share,cpu_weight_share,gpu_weight_share,neural_engine_weight_share,samples,sessions,median_ms,p95_ms,throughput_per_s,warmup_settled,output_mean_abs,energy_j_per_inference,cpu_mw,gpu_mw,ane_mw,ane_above_other_runs
+mobilenet_v2,float16,1,cpuAndGPU,True,gpu,1.000000,0.000000,1.000000,0.000000,300,3,0.856958,0.976617,1166.917651,True,0.360028,,,,,
+mobilenet_v2,float16,1,cpuAndNeuralEngine,True,neuralEngine,1.000000,0.000000,0.000000,1.000000,300,3,0.380916,0.422420,2625.247265,True,0.360312,,,,,
+mobilenet_v2,float16,1,cpuOnly,True,cpu,1.000000,1.000000,0.000000,0.000000,300,3,1.954438,2.150962,511.656036,True,0.360149,,,,,

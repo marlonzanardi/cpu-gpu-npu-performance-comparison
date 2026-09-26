@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -13,39 +14,63 @@ def _deployment_target(coremltools: object) -> object:
     return target.macOS14
 
 
-WEIGHTS = {
-    "mobilenet_v2": "IMAGENET1K_V1",
-    "resnet50": "IMAGENET1K_V2",
-}
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
-def _build_torch_model(model_name: str, batch: int) -> object:
+def _recorded_onnx(root: Path, model_name: str) -> tuple[str | None, str | None]:
+    index_path = root / "models" / "index.json"
+    if not index_path.exists():
+        return None, None
+    spec = json.loads(index_path.read_text(encoding="utf-8")).get("models", {}).get(model_name, {})
+    fp32 = spec.get("fp32", {})
+    weights = spec.get("weights")
+    digest = fp32.get("sha256")
+    return (str(weights) if weights else None, str(digest) if digest else None)
+
+
+def ensure_onnx(root: Path, model_name: str) -> dict[str, object]:
+    from bench.export_models import export_fp32
+
+    destination = root / "models" / f"{model_name}-fp32.onnx"
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    recorded_weights, windows_sha256 = _recorded_onnx(root, model_name)
+    if not destination.exists():
+        exported_weights = export_fp32(model_name, destination)
+        recorded_weights = recorded_weights or str(exported_weights)
+    digest = _sha256(destination)
+    return {
+        "onnx_path": str(destination.relative_to(root)),
+        "onnx_sha256": digest,
+        "weights": recorded_weights,
+        "windows_onnx_sha256": windows_sha256,
+        "matches_windows_onnx_file": bool(windows_sha256) and digest == windows_sha256,
+    }
+
+
+def _module_from_onnx(path: Path, batch: int) -> object:
     import torch
-    from torchvision.models import MobileNet_V2_Weights, ResNet50_Weights, mobilenet_v2, resnet50
+    from onnx2torch import convert as onnx_to_torch
 
-    if model_name == "mobilenet_v2":
-        model = mobilenet_v2(weights=MobileNet_V2_Weights.IMAGENET1K_V1)
-    elif model_name == "resnet50":
-        model = resnet50(weights=ResNet50_Weights.IMAGENET1K_V2)
-    else:
-        raise ValueError(f"unknown model: {model_name}")
-    model = model.to("cpu").eval()
-    example = torch.rand(batch, 3, 224, 224)
+    module = onnx_to_torch(str(path)).to("cpu").eval()
+    example = torch.zeros(batch, 3, 224, 224)
     with torch.inference_mode():
-        return torch.jit.trace(model, example)
+        return torch.jit.trace(module, example)
 
 
 def _compile(package_path: Path, compiled_path: Path) -> Path:
+    import shutil
+
     import coremltools as ct
 
     if compiled_path.exists():
-        import shutil
-
         shutil.rmtree(compiled_path)
     produced = Path(ct.models.utils.compile_model(str(package_path), destination_path=str(compiled_path)))
-    if produced.resolve() != compiled_path.resolve() and produced.exists():
-        if compiled_path.exists():
-            return compiled_path
+    if produced.resolve() != compiled_path.resolve() and produced.exists() and not compiled_path.exists():
         produced.rename(compiled_path)
     if not compiled_path.exists():
         raise RuntimeError(f"compiled model missing at {compiled_path}")
@@ -54,7 +79,11 @@ def _compile(package_path: Path, compiled_path: Path) -> Path:
 
 def convert_model(root: Path, model_name: str, precision: str, batch: int) -> Path:
     import coremltools as ct
-    import torch
+
+    if precision not in {"float16", "float32"}:
+        raise ValueError(f"unknown precision: {precision}")
+    if model_name not in {"mobilenet_v2", "resnet50"}:
+        raise ValueError(f"unknown model: {model_name}")
 
     cache = root / "build" / "models"
     cache.mkdir(parents=True, exist_ok=True)
@@ -62,29 +91,29 @@ def convert_model(root: Path, model_name: str, precision: str, batch: int) -> Pa
     package_path = cache / f"{stem}.mlpackage"
     compiled_path = cache / f"{stem}.mlmodelc"
     meta_path = cache / f"{stem}.json"
-    if model_name not in WEIGHTS:
-        raise ValueError(f"unknown model: {model_name}")
+    source = ensure_onnx(root, model_name)
     meta = {
         "batch": batch,
+        "converter": "onnx2torch",
         "coremltools": ct.__version__,
+        "matches_windows_onnx_file": source["matches_windows_onnx_file"],
         "model": model_name,
+        "onnx_sha256": source["onnx_sha256"],
         "precision": precision,
-        "torch": torch.__version__,
-        "weights": WEIGHTS[model_name],
+        "source": "onnx-fp32",
+        "weights": source["weights"],
+        "windows_onnx_sha256": source["windows_onnx_sha256"],
     }
     if compiled_path.exists() and meta_path.exists():
         saved = json.loads(meta_path.read_text(encoding="utf-8"))
         if saved == meta:
             return compiled_path
 
-    traced = _build_torch_model(model_name, batch)
+    traced = _module_from_onnx(root / str(source["onnx_path"]), batch)
     precision_constant = ct.precision.FLOAT16 if precision == "float16" else ct.precision.FLOAT32
-    if precision not in {"float16", "float32"}:
-        raise ValueError(f"unknown precision: {precision}")
-    example_shape = (batch, 3, 224, 224)
     converted = ct.convert(
         traced,
-        inputs=[ct.TensorType(name="input", shape=example_shape, dtype=np.float32)],
+        inputs=[ct.TensorType(name="input", shape=(batch, 3, 224, 224), dtype=np.float32)],
         convert_to="mlprogram",
         compute_precision=precision_constant,
         compute_units=ct.ComputeUnit.ALL,

@@ -58,26 +58,26 @@ A Radeon integrada não ocupa o lugar da NPU.
 
 ## Experimento B — Mac
 
-Runtime: Core ML. O modelo ONNX do experimento A é convertido, e o manifesto guarda a ferramenta, a versão e o arquivo gerado.
+Runtime: Core ML. O Core ML Tools 9 não converte ONNX. A sessão citada exporta o FP32 com o mesmo script da workstation (`bench/export_models.py`) e os mesmos nomes de pesos (`IMAGENET1K_V2` nos dois modelos), carrega esse ONNX com `onnx2torch` e só então gera o programa Core ML. O SHA-256 desse arquivo não coincide com o registrado na workstation, então os bytes do protobuf não são os mesmos. Os pesos deixaram de ser o `IMAGENET1K_V1` usado na primeira sessão do Mac.
 
-Unidades de computação:
+Unidades de computação no M4 Pro medido:
 
 | Corrida | `computeUnits` | O que representa |
 |---|---|---|
 | CPU | `cpuOnly` | CPU |
-| GPU | `cpuAndGPU` | GPU Apple, incluindo Neural Accelerator dos núcleos gráficos |
+| GPU | `cpuAndGPU` | GPU Apple de 16 núcleos |
 | NPU | `cpuAndNeuralEngine` | Neural Engine, com a CPU nas operações que ele não absorve |
 
 `all` não é corrida do estudo. Esse modo mistura CPU, GPU e Neural Engine.
 
 Não existe modo somente Neural Engine. A frase do artigo descreve `cpuAndNeuralEngine` com essa ressalva.
 
-Uma corrida de NPU entra na tabela quando as duas condições abaixo se confirmam:
+A regra desejada para uma corrida de NPU exige as duas condições abaixo:
 
-1. O `MLComputePlan` coloca a maioria das operações no Neural Engine.
+1. O `MLComputePlan` coloca pelo menos metade do peso no Neural Engine.
 2. Durante a janela medida, `ane_power` sobe em relação ao idle, e permanece no idle nas corridas `cpuOnly` e `cpuAndGPU`.
 
-Se a maioria das operações cair na CPU, o resultado é fallback e não entra na coluna NPU.
+Na sessão citada de 26 de setembro de 2026, às 20:40 UTC, as duas condições foram observadas. O plano exige metade do peso no Neural Engine. O `ane_power` ficou em 0 mW nas corridas de CPU e de GPU e subiu para cerca de 2 W a 3 W nas corridas float16 do Neural Engine.
 
 Energia: `powermetrics` com `cpu_power`, `gpu_power` e `ane_power`, amostrado durante a janela, integrado em joule por inferência por trilho. Notebook na tomada, tela em repouso, outros aplicativos fechados. O valor é estimativa do chip, não da tomada.
 
@@ -111,12 +111,12 @@ Isto é registro do que as duas corridas mostraram. Não é a conclusão do arti
 | Máquina | Condição que muda a leitura |
 |---|---|
 | Windows, Ryzen 9 7900X3D e RTX 4070 Ti | ONNX Runtime, FP32 com TF32 desligado, desktop, pausa de 60 s. Sem NPU. Energia só da placa. |
-| MacBook Pro M4 Pro, 24 GB | Core ML, na tomada, pausa de 2 s, sem `powermetrics`. Batch 1 e 8. |
+| MacBook Pro M4 Pro, 24 GB | Core ML, na tomada, pausa de 60 s, `powermetrics` nos três trilhos. Batch 1 e 8. Modelo carregado do ONNX FP32. |
 
 No Windows, em FP32 e batch 1, a mediana ficou em 3,04 ms na CPU e 2,38 ms na GPU para o MobileNetV2, e em 32,7 ms na CPU e 3,32 ms na GPU para o ResNet-50. A GPU discreta se separa da CPU quando o modelo pesa ou o batch sobe. O p95 da CPU no ResNet-50 passa de 80 ms. A máquina não estava isolada.
 
-No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o MobileNetV2 ficou em 1,96 ms na CPU, 0,93 ms na GPU e 0,38 ms no Neural Engine. O ResNet-50 ficou em 4,13 ms na CPU e 1,05 ms no Neural Engine. O pedido de GPU para o ResNet-50 em batch 1 ficou majoritariamente na CPU e foi descartado. Em float32 o Neural Engine não executou nenhum dos dois modelos.
+No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o MobileNetV2 ficou em 2,07 ms na CPU, 0,87 ms na GPU e 0,43 ms no Neural Engine. O ResNet-50 ficou em 4,15 ms na CPU e 1,01 ms no Neural Engine. O pedido de GPU para o ResNet-50 em batch 1 ficou com 56% do peso na CPU e foi descartado. Em float32 o Neural Engine não executou nenhum dos dois modelos. Nessa sessão o trilho `ane_power` confirmou o plano: 0 mW fora das corridas de Neural Engine e cerca de 2 W a 3 W dentro delas.
 
-Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 5,1 vezes no MobileNetV2 e 3,9 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
+Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 4,9 vezes no MobileNetV2 e 4,1 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
 
-Energia da tomada e joule da CPU continuam sem medição. A sessão citada do Mac foi na tomada. A pausa entre sessões foi de 2 segundos, então o chip não voltou ao idle térmico entre elas.
+O joule do Mac é a soma estimada dos trilhos de CPU, GPU e Neural Engine durante uma janela sustentada de 3 segundos, dividida pelo número de predições. Não é a tomada. No MobileNetV2 em float16 e batch 1, essa conta deu 0,013 J na CPU, 0,011 J na GPU e 0,0018 J no Neural Engine.

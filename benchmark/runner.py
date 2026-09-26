@@ -8,9 +8,11 @@ from typing import Any
 
 import click
 
+from benchmark.energy import integrate_window, parse_powermetrics
 from benchmark.stats import median, percentile
 
 COMPUTE_UNITS = ("cpuOnly", "cpuAndGPU", "cpuAndNeuralEngine")
+SUSTAIN_MILLISECONDS = 3000
 REQUESTED_DEVICE = {
     "cpuOnly": "cpu",
     "cpuAndGPU": "gpu",
@@ -125,6 +127,11 @@ def write_summary(path: Path, rows: list[dict[str, object]]) -> None:
         "throughput_per_s",
         "warmup_settled",
         "output_mean_abs",
+        "energy_j_per_inference",
+        "cpu_mw",
+        "gpu_mw",
+        "ane_mw",
+        "ane_above_other_runs",
     ]
     lines = [",".join(fieldnames)]
     for row in rows:
@@ -133,6 +140,8 @@ def write_summary(path: Path, rows: list[dict[str, object]]) -> None:
             value = row[field]
             if isinstance(value, float):
                 cells.append(f"{value:.6f}")
+            elif value is None or value == "":
+                cells.append("")
             else:
                 cells.append(str(value))
         lines.append(",".join(cells))
@@ -195,6 +204,7 @@ def execute(
     warmup_flags: dict[tuple[str, str, int, str], list[bool]] = {}
     output_means: dict[tuple[str, str, int, str], list[float]] = {}
     plans: dict[tuple[str, str, int, str], dict[str, Any]] = {}
+    sustains: dict[tuple[str, str, int, str], list[dict[str, Any]]] = {}
     model_records: list[dict[str, object]] = []
 
     for model_name in models:
@@ -216,6 +226,8 @@ def execute(
                     )
                     click.echo(f"convert failed for {key_label}: {exc}", err=True)
                     continue
+                meta_path = root / "build" / "models" / f"{model_name}-{precision}-b{batch}.json"
+                meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
                 model_records.append(
                     {
                         "model": model_name,
@@ -223,6 +235,11 @@ def execute(
                         "batch": batch,
                         "compiled_model_sha256": directory_sha256(compiled),
                         "path": str(compiled.relative_to(root)),
+                        "onnx_sha256": meta.get("onnx_sha256"),
+                        "windows_onnx_sha256": meta.get("windows_onnx_sha256"),
+                        "matches_windows_onnx_file": meta.get("matches_windows_onnx_file"),
+                        "weights": meta.get("weights"),
+                        "source": meta.get("source"),
                     }
                 )
                 for compute_units in COMPUTE_UNITS:
@@ -307,6 +324,80 @@ def execute(
                         click.echo(
                             f"  median {median(latencies):.3f} ms  p95 {percentile(latencies, 0.95):.3f} ms"
                         )
+                        try:
+                            sustained = swift_json(
+                                binary,
+                                [
+                                    "sustain",
+                                    str(compiled),
+                                    compute_units,
+                                    str(warmup),
+                                    str(SUSTAIN_MILLISECONDS),
+                                ],
+                            )
+                        except Exception as exc:
+                            failures.append(
+                                {
+                                    "stage": "sustain",
+                                    "model": model_name,
+                                    "precision": precision,
+                                    "batch": batch,
+                                    "compute_units": compute_units,
+                                    "session": session,
+                                    "error": str(exc),
+                                }
+                            )
+                            click.echo(
+                                f"sustain failed for {key_label} {compute_units} session {session}: {exc}",
+                                err=True,
+                            )
+                            continue
+                        sustains.setdefault(plan_key, []).append(sustained)
+
+    power_samples = parse_powermetrics(root / "build" / "powermetrics.txt")
+    energy_by_key: dict[tuple[str, str, int, str], list[dict[str, object]]] = {}
+    energy_lines: list[dict[str, object]] = []
+    for key, windows in sustains.items():
+        model_name, precision, batch, compute_units = key
+        for session_index, window in enumerate(windows, start=1):
+            integrated = integrate_window(
+                power_samples,
+                int(window["measure_start_unix_ns"]),
+                int(window["measure_end_unix_ns"]),
+                int(window["inferences"]),
+            )
+            record: dict[str, object] = {
+                "model": model_name,
+                "precision": precision,
+                "batch": batch,
+                "compute_units": compute_units,
+                "session": session_index,
+                "inferences": int(window["inferences"]),
+            }
+            if integrated is None:
+                record["integrated"] = False
+            else:
+                record["integrated"] = True
+                record.update(integrated)
+                energy_by_key.setdefault(key, []).append(integrated)
+            energy_lines.append(record)
+
+    def _median_field(key: tuple[str, str, int, str], field: str) -> float | None:
+        values = [float(item[field]) for item in energy_by_key.get(key, []) if item.get(field) is not None]
+        if not values:
+            return None
+        return median(values)
+
+    def _ane_confirmed(model_name: str, precision: str, batch: int) -> bool | None:
+        neural = _median_field((model_name, precision, batch, "cpuAndNeuralEngine"), "ane_mw")
+        others = [
+            _median_field((model_name, precision, batch, "cpuOnly"), "ane_mw"),
+            _median_field((model_name, precision, batch, "cpuAndGPU"), "ane_mw"),
+        ]
+        known = [value for value in others if value is not None]
+        if neural is None or not known:
+            return None
+        return neural > max(known) + 5.0
 
     rows: list[dict[str, object]] = []
     for key in sorted(grouped):
@@ -337,6 +428,13 @@ def execute(
                 "throughput_per_s": (1000.0 / median_ms) * batch if median_ms > 0 else 0.0,
                 "warmup_settled": all(warmup_flags.get(key, [])),
                 "output_mean_abs": median(output_means[key]),
+                "energy_j_per_inference": "" if _median_field(key, "energy_j") is None else _median_field(key, "energy_j"),
+                "cpu_mw": "" if _median_field(key, "cpu_mw") is None else _median_field(key, "cpu_mw"),
+                "gpu_mw": "" if _median_field(key, "gpu_mw") is None else _median_field(key, "gpu_mw"),
+                "ane_mw": "" if _median_field(key, "ane_mw") is None else _median_field(key, "ane_mw"),
+                "ane_above_other_runs": _ane_confirmed(model_name, precision, batch)
+                if compute_units == "cpuAndNeuralEngine"
+                else "",
             }
         )
     write_summary(output / "summary.csv", rows)
@@ -345,8 +443,11 @@ def execute(
         "runtime": "coreml",
         "comparison": "same compiled mlprogram loaded with cpuOnly, cpuAndGPU, and cpuAndNeuralEngine",
         "accuracy_evaluated": False,
-        "energy_collected": False,
-        "energy_reason": "powermetrics requires sudo and was not sampled",
+        "energy_collected": any(record.get("integrated") for record in energy_lines),
+        "energy_method": "powermetrics cpu_power,gpu_power,ane_power at 200 ms, integrated over a separate sustained prediction window of at least 3 seconds, divided by the number of predictions",
+        "energy_reason": ""
+        if power_samples
+        else "powermetrics log was not available at build/powermetrics.txt",
         "percentile_method": "linear_rank",
         "placement_rule": "a device result matches the request when that device holds at least half of the compute-plan weight",
         "warmup_iterations": warmup,
@@ -359,6 +460,10 @@ def execute(
         "failures": failures,
     }
     (output / "manifest.json").write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    if energy_lines:
+        with (output / "energy.jsonl").open("w", encoding="utf-8") as handle:
+            for record in energy_lines:
+                handle.write(json.dumps(record, sort_keys=True) + "\n")
     if failures:
         (output / "failures.json").write_text(json.dumps(failures, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if not rows:

@@ -195,10 +195,13 @@ static NSArray<NSNumber *> *shapeNumbers(NSArray<NSNumber *> *shape) {
     return values;
 }
 
-static void measure(NSURL *url, NSString *computeUnits, int warmup, int iterations) {
-    if (warmup < 1 || iterations < 1) {
-        fail(@"warmup and iterations must be positive");
-    }
+static uint64_t unixNanoseconds(void) {
+    struct timespec stamp;
+    clock_gettime(CLOCK_REALTIME, &stamp);
+    return (uint64_t)stamp.tv_sec * 1000000000ull + (uint64_t)stamp.tv_nsec;
+}
+
+static MLDictionaryFeatureProvider *preparedInput(NSURL *url, NSString *computeUnits, MLModel **loaded) {
     NSError *error = nil;
     MLModel *model = [MLModel modelWithContentsOfURL:url configuration:configuration(computeUnits) error:&error];
     if (model == nil) {
@@ -221,6 +224,19 @@ static void measure(NSURL *url, NSString *computeUnits, int warmup, int iteratio
     if (provider == nil) {
         fail(error.localizedDescription ?: @"failed to build input");
     }
+    *loaded = model;
+    return provider;
+}
+
+static void measure(NSURL *url, NSString *computeUnits, int warmup, int iterations) {
+    if (warmup < 1 || iterations < 1) {
+        fail(@"warmup and iterations must be positive");
+    }
+    NSError *error = nil;
+    MLModel *model = nil;
+    MLDictionaryFeatureProvider *provider = preparedInput(url, computeUnits, &model);
+    NSString *inputName = model.modelDescription.inputDescriptionsByName.allKeys.firstObject;
+    MLMultiArrayConstraint *constraint = model.modelDescription.inputDescriptionsByName[inputName].multiArrayConstraint;
     NSMutableArray<NSNumber *> *warmupLatencies = [NSMutableArray arrayWithCapacity:warmup];
     double outputMean = 0;
     for (int index = 0; index < warmup; index++) {
@@ -241,6 +257,7 @@ static void measure(NSURL *url, NSString *computeUnits, int warmup, int iteratio
             fail(@"prediction output is not finite");
         }
     }
+    uint64_t windowStart = unixNanoseconds();
     NSMutableArray<NSNumber *> *latencies = [NSMutableArray arrayWithCapacity:iterations];
     for (int index = 0; index < iterations; index++) {
         uint64_t started = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
@@ -251,14 +268,50 @@ static void measure(NSURL *url, NSString *computeUnits, int warmup, int iteratio
         }
         [latencies addObject:@((double)(finished - started) / 1e6)];
     }
+    uint64_t windowEnd = unixNanoseconds();
     emit(@{
         @"compute_units": computeUnits,
         @"input_data_type": dataTypeName(constraint.dataType),
         @"input_name": inputName,
         @"input_shape": shapeNumbers(constraint.shape),
         @"latencies_ms": latencies,
+        @"measure_end_unix_ns": [NSString stringWithFormat:@"%llu", windowEnd],
+        @"measure_start_unix_ns": [NSString stringWithFormat:@"%llu", windowStart],
         @"output_mean_abs": @(outputMean),
         @"warmup_latencies_ms": warmupLatencies,
+    });
+}
+
+static void sustain(NSURL *url, NSString *computeUnits, int warmup, int minimumMilliseconds) {
+    if (warmup < 1 || minimumMilliseconds < 1) {
+        fail(@"warmup and duration must be positive");
+    }
+    NSError *error = nil;
+    MLModel *model = nil;
+    MLDictionaryFeatureProvider *provider = preparedInput(url, computeUnits, &model);
+    for (int index = 0; index < warmup; index++) {
+        id<MLFeatureProvider> prediction = [model predictionFromFeatures:provider error:&error];
+        if (prediction == nil) {
+            fail(error.localizedDescription ?: @"prediction failed");
+        }
+    }
+    uint64_t windowStart = unixNanoseconds();
+    uint64_t started = clock_gettime_nsec_np(CLOCK_UPTIME_RAW);
+    int inferences = 0;
+    while ((clock_gettime_nsec_np(CLOCK_UPTIME_RAW) - started) / 1000000ull < (uint64_t)minimumMilliseconds) {
+        id<MLFeatureProvider> prediction = [model predictionFromFeatures:provider error:&error];
+        if (prediction == nil) {
+            fail(error.localizedDescription ?: @"prediction failed");
+        }
+        inferences += 1;
+    }
+    uint64_t windowEnd = unixNanoseconds();
+    emit(@{
+        @"compute_units": computeUnits,
+        @"inferences": @(inferences),
+        @"measure_end_unix_ns": [NSString stringWithFormat:@"%llu", windowEnd],
+        @"measure_start_unix_ns": [NSString stringWithFormat:@"%llu", windowStart],
+        @"minimum_milliseconds": @(minimumMilliseconds),
     });
 }
 
@@ -285,6 +338,15 @@ int main(int argc, char **argv) {
             int warmup = atoi(argv[4]);
             int iterations = atoi(argv[5]);
             measure(url, computeUnits, warmup, iterations);
+            return 0;
+        }
+        if ([command isEqualToString:@"sustain"]) {
+            if (argc != 6) {
+                fail(@"usage: bench sustain <model.mlmodelc> <compute-units> <warmup> <minimum-milliseconds>");
+            }
+            int warmup = atoi(argv[4]);
+            int minimumMilliseconds = atoi(argv[5]);
+            sustain(url, computeUnits, warmup, minimumMilliseconds);
             return 0;
         }
         fail([NSString stringWithFormat:@"unknown command: %@", command]);

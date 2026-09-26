@@ -1,0 +1,60 @@
+{
+  "accuracy_evaluated": false,
+  "comparison": "same compiled mlprogram loaded with cpuOnly, cpuAndGPU, and cpuAndNeuralEngine",
+  "created_at": "20260926T221801Z",
+  "energy_collected": false,
+  "energy_method": "powermetrics cpu_power,gpu_power,ane_power at 200 ms, integrated over a separate sustained prediction window of at least 3 seconds, divided by the number of predictions",
+  "energy_reason": "",
+  "failures": [],
+  "inter_session_pause_seconds": 60.0,
+  "machine": {
+    "architecture": "arm64",
+    "chip": "Apple M4 Pro",
+    "cpu": {
+      "cpu_cores": 12,
+      "efficiency_cores": 4,
+      "performance_cores": 8
+    },
+    "cpu_raw": "proc 12:8:4",
+    "gpu_cores": 16,
+    "low_power_mode": false,
+    "machine_name": "MacBook Pro",
+    "memory": "24 GB",
+    "metal": "spdisplays_metal3",
+    "model_identifier": "Mac16,8",
+    "model_number": "MX2H3LL/A",
+    "os": {
+      "build": "24E263",
+      "product": "macOS",
+      "version": "15.4.1"
+    },
+    "power_mode": "automatic",
+    "power_source": "ac"
+  },
+  "measured_iterations": 100,
+  "models": [
+    {
+      "batch": 1,
+      "compiled_model_sha256": "f9a85c2bd055aab384821c06d8c1ec665d0911a00085c1e397c67a0feefaf984",
+      "matches_windows_onnx_file": false,
+      "model": "mobilenet_v2",
+      "onnx_sha256": "9c2c23fc40dd7bd061e11aed10b392050b07799e5334c7ad1b4fef10ea4c1a1c",
+      "path": "build/models/mobilenet_v2-float16-b1.mlmodelc",
+      "precision": "float16",
+      "source": "onnx-fp32",
+      "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
+      "windows_onnx_sha256": "e938a7bac33071015439c5419f74813ebe9b0abbccac0568b2e11d99451734b6"
+    }
+  ],
+  "packages": {
+    "coremltools": "9.0",
+    "numpy": "2.4.6",
+    "torch": "2.14.0",
+    "torchvision": "0.29.0"
+  },
+  "percentile_method": "linear_rank",
+  "placement_rule": "a device result matches the request when that device holds at least half of the compute-plan weight",
+  "runtime": "coreml",
+  "sessions": 3,
+  "warmup_iterations": 80
+}

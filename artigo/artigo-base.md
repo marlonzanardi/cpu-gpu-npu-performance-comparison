@@ -1,6 +1,6 @@
 # Artigo base
 
-**Em construção.** Este texto é uma análise inicial. Nada aqui é definição do estudo: nem o problema, nem os objetivos, nem a fundamentação, nem a medição. A seção final registra a primeira corrida e também pode mudar.
+**Rascunho anterior.** A leitura atual do estudo está em `artigo/artigo-v2.md`. Este arquivo guarda a primeira redação. A pergunta ampla, a promessa de eficiência energética e as figuras conceituais daqui não descrevem o que foi medido.
 
 O registro operacional está em `protocol/measurement-protocol.md` e `protocol/experiments.yaml`. As figuras da primeira corrida estão no `README.md`.
 

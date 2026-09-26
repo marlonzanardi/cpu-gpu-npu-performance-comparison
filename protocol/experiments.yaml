@@ -4,7 +4,7 @@ author: Marlon Zanardi
 recorded_on: 2026-09-26
 recorded_runs:
   - results/windows-workstation/20260926T195237Z
-  - results/apple-m4-pro/20260926T200938Z
+  - results/apple-m4-pro/20260926T204025Z
 
 models:
   - id: mobilenet_v2
@@ -42,9 +42,19 @@ experiments:
     excluded_compute_units: [all]
     energy: powermetrics_cpu_power_gpu_power_ane_power
     npu_run_is_valid_when:
-      - compute_plan_places_the_majority_of_ops_on_the_neural_engine
+      - compute_plan_weight_share_at_least_half_on_the_neural_engine
       - ane_power_rises_above_the_idle_baseline_during_the_measured_window
       - ane_power_stays_at_baseline_during_cpuOnly_and_cpuAndGPU
+    cited_run:
+      placement_rule_applied: compute_plan_weight_share_at_least_half
+      ane_power: sampled
+      ane_power_above_other_runs: true_for_float16_neural_engine
+      model_source: onnx_fp32_loaded_with_onnx2torch
+      onnx_file_sha256_matches_windows: false
+      mobilenet_v2_weights: IMAGENET1K_V2
+      resnet50_weights: IMAGENET1K_V2
+      inter_session_pause_seconds: 60
+      power_source: ac
 
 output:
   directory: results/{machine_id}/{utc_timestamp}

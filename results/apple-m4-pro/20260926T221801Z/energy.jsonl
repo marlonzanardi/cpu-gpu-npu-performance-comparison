@@ -1,0 +1,9 @@
+{"batch": 1, "compute_units": "cpuOnly", "inferences": 1518, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 1}
+{"batch": 1, "compute_units": "cpuOnly", "inferences": 1508, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 2}
+{"batch": 1, "compute_units": "cpuOnly", "inferences": 1514, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 3}
+{"batch": 1, "compute_units": "cpuAndGPU", "inferences": 3506, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 1}
+{"batch": 1, "compute_units": "cpuAndGPU", "inferences": 3361, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 2}
+{"batch": 1, "compute_units": "cpuAndGPU", "inferences": 3507, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 3}
+{"batch": 1, "compute_units": "cpuAndNeuralEngine", "inferences": 8501, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 1}
+{"batch": 1, "compute_units": "cpuAndNeuralEngine", "inferences": 8256, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 2}
+{"batch": 1, "compute_units": "cpuAndNeuralEngine", "inferences": 8246, "integrated": false, "model": "mobilenet_v2", "precision": "float16", "session": 3}
