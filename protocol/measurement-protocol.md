@@ -121,3 +121,24 @@ No M4 Pro, a comparação de três dispositivos existe em float16. Em batch 1, o
 Contra a CPU da mesma máquina e na mesma precisão, no batch 1, a 4070 Ti chega a cerca de 9,9 vezes no ResNet-50 em FP32 e fica perto de 1,3 vezes no MobileNetV2. No M4 Pro, em float16, o Neural Engine chega a cerca de 4,9 vezes no MobileNetV2 e 4,1 vezes no ResNet-50. Esses ganhos não ordenam o Neural Engine contra a 4070 Ti.
 
 O joule do Mac é a soma estimada dos trilhos de CPU, GPU e Neural Engine durante uma janela sustentada de 3 segundos, dividida pelo número de predições. Não é a tomada. No MobileNetV2 em float16 e batch 1, essa conta deu 0,013 J na CPU, 0,011 J na GPU e 0,0018 J no Neural Engine.
+
+## Fechamento do manuscrito
+
+O texto que estes arquivos sustentam é `artigo/artigo-v2.md`. Não há corrida pendente para esse texto.
+
+Entram nas figuras:
+
+- `results/windows-workstation/20260926T195237Z`
+- `results/apple-m4-pro/20260926T204025Z`
+
+Ficam de fora das figuras, com o motivo no manuscrito:
+
+- `results/apple-m4-pro/20260926T195525Z` e `20260926T200938Z`, sessões anteriores, a primeira na bateria e as duas sem `powermetrics`.
+- `results/apple-m4-pro/20260926T221801Z`, só MobileNetV2 em float16 e batch 1. Serviu para checar o aquecimento da GPU: 0,86 ms contra 0,87 ms da sessão citada. A energia dessa pasta não foi integrada.
+- `results/apple-m1/20260926T203102Z`, outro chip e, no MobileNetV2, outro checkpoint.
+
+A razão de 9,9× no ResNet-50 da workstation é a mediana das sessões. As medianas da CPU nessas sessões foram 27,4 ms, 32,7 ms e 44,9 ms. A razão sessão a sessão vai de 8,3× a 14×. Isso fica escrito no manuscrito. Não pede outra corrida.
+
+O SHA-256 do ONNX do Mac não é o da workstation. O manuscrito aceita o mesmo exportador e o mesmo nome de pesos, e não afirma grafo idêntico. Isso também não pede outra corrida.
+
+Joule da placa e joule dos trilhos do Mac não se comparam. Potência da tomada e pacote do Ryzen ficam fora do manuscrito.

@@ -35,9 +35,9 @@ Batch 1. No Windows a precisão é FP32. No M4 Pro é float16, a única precisã
 | M4 Pro, MobileNetV2, float16 | 2,07 ms | 0,87 ms | 0,43 ms |
 | M4 Pro, ResNet-50, float16 | 4,15 ms | sem corrida válida | 1,01 ms |
 
-No modelo pequeno, CPU e GPU ficam próximas. No ResNet-50 a distância abre. Na 4070 Ti ela é de cerca de dez vezes contra o Ryzen. No M4 Pro o Neural Engine faz o ResNet-50 em cerca de um quarto do tempo da CPU. O pedido de GPU para esse ResNet-50 em batch 1 ficou 56% na CPU e saiu do gráfico.
+No modelo pequeno, CPU e GPU ficam próximas. No ResNet-50 a distância abre. A razão das medianas na 4070 Ti é 9,9× contra o Ryzen. As três sessões dessa CPU foram 27,4 ms, 32,7 ms e 44,9 ms, então a razão sessão a sessão vai de 8,3× a 14×. No M4 Pro o Neural Engine faz o ResNet-50 em cerca de um quarto do tempo da CPU. O pedido de GPU para esse ResNet-50 em batch 1 ficou 56% na CPU e saiu do gráfico.
 
-O p95 da CPU no Windows, no ResNet-50, passa de 80 ms. A mediana é o centro da comparação. A máquina não estava isolada, e esse p95 ainda não serve como número de artigo.
+O p95 da CPU no Windows, no ResNet-50, passa de 80 ms. A mediana é o centro da comparação. Esse p95 não entra como especificação do Ryzen.
 
 ![Throughput dentro de cada máquina](results/comparison/20260926/throughput_within_machine.png)
 

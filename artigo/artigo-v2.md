@@ -114,11 +114,11 @@ No modelo pequeno, CPU e GPU da workstation ficam próximas. No ResNet-50, a 407
 
 O pedido de GPU para o ResNet-50 em float16 e batch 1 ficou com 55,7% do peso na CPU e 44,3% na GPU. A mediana dessa chamada foi 3,14 ms. O número existe no registro e não entra na tabela de GPU. Em float32 e batch 1, o mesmo pedido ficou com 77,3% do peso na CPU.
 
-O percentil 95 da CPU da workstation no ResNet-50 passa de 80 ms, com mediana de 32,7 ms. A mediana é o centro da comparação. Esse p95 descreve dispersão numa máquina que não estava isolada. Não é a latência típica a citar como especificação do Ryzen.
+O percentil 95 da CPU da workstation no ResNet-50 passa de 80 ms. As medianas das três sessões dessa CPU foram 27,4 ms, 32,7 ms e 44,9 ms. As da GPU, nas mesmas sessões, foram 3,15 ms, 3,32 ms e 3,36 ms. A razão de 9,9× divide a mediana dessas sessões da CPU pela mediana das sessões da GPU. Sessão a sessão, a razão vai de 8,3× a 14×. O 9,9× é o centro desse intervalo, não uma constante do processador. A máquina não estava isolada, e o p95 não entra como especificação do Ryzen.
 
 ### 4.2 O pedido ao Neural Engine em float32
 
-Em float32, `cpuAndNeuralEngine` colocou 100% do peso na CPU nos dois modelos e nos batches 1 e 8. A mediana acompanha a corrida `cpuOnly`. No MobileNetV2 e batch 1, 3,11 ms contra 3,12 ms. No ResNet-50 e batch 1, 8,04 ms contra 8,04 ms. Essa coluna não é NPU.
+Em float32, `cpuAndNeuralEngine` colocou 100% do peso na CPU nos dois modelos e nos batches 1 e 8. A mediana acompanha a corrida `cpuOnly`. No MobileNetV2 e batch 1, 3,26 ms contra 3,28 ms. No ResNet-50 e batch 1, 8,08 ms contra 8,10 ms. Essa coluna não é NPU.
 
 A comparação de três dispositivos no M4 Pro existe em float16. Fora dessa precisão, o estudo tem CPU e, quando o plano confirma, GPU.
 
@@ -191,9 +191,9 @@ Uma submissão que ignore os itens abaixo afirma mais do que o registro.
 
 ## 7. Conclusão
 
-Em cada plataforma, o acelerador que de fato executa o modelo se afasta da CPU conforme o custo da rede e o tamanho do lote. Na workstation, sem NPU, a RTX 4070 Ti em FP32 fica 1,3 vez à frente do Ryzen no MobileNetV2 e 9,9 vezes no ResNet-50, em batch 1, e o throughput da placa sobe até um teto entre os batches 8 e 32. No M4 Pro, o Neural Engine em float16 fica 4,9 vezes à frente da CPU no MobileNetV2 e 4,1 vezes no ResNet-50. A GPU integrada só entra na comparação quando o plano a confirma, e no modelo pequeno ela se aproxima do Neural Engine quando o batch vai a 8. O trilho do Neural Engine só sobe nessas corridas.
+Em cada plataforma, o acelerador que de fato executa o modelo se afasta da CPU conforme o custo da rede e o tamanho do lote. Na workstation, sem NPU, a RTX 4070 Ti em FP32 fica 1,3 vez à frente do Ryzen no MobileNetV2. No ResNet-50, a razão das medianas é 9,9×, e as sessões da CPU vão de 27,4 ms a 44,9 ms, o que leva a razão sessão a sessão de 8,3× a 14×. O throughput da placa sobe até um teto entre os batches 8 e 32. No M4 Pro, o Neural Engine em float16 fica 4,9 vezes à frente da CPU no MobileNetV2 e 4,1 vezes no ResNet-50. A GPU integrada só entra na comparação quando o plano a confirma, e no modelo pequeno ela se aproxima do Neural Engine quando o batch vai a 8. O trilho do Neural Engine só sobe nessas corridas.
 
-O que o estudo não conclui é uma ordem entre Neural Engine e RTX 4070 Ti, uma vantagem energética numa grandeza comum e um comportamento geral de CPU, GPU e NPU fora destas duas redes, destes dois runtimes e destas duas máquinas. O próximo fechamento, se o manuscrito for adiante, é obter o arquivo ONNX da workstation com o mesmo SHA-256, ou aceitar de forma explícita que o exportador não é determinístico entre as duas máquinas.
+O que o estudo não conclui é uma ordem entre Neural Engine e RTX 4070 Ti, uma vantagem energética numa grandeza comum e um comportamento geral de CPU, GPU e NPU fora destas duas redes, destes dois runtimes e destas duas máquinas. O arquivo ONNX do Mac não tem o SHA-256 da workstation. O manuscrito aceita essa diferença: o exportador e o nome dos pesos são os mesmos, os bytes do protobuf não são. Nenhuma corrida adicional entra neste texto. As sessões citadas são `results/windows-workstation/20260926T195237Z` e `results/apple-m4-pro/20260926T204025Z`.
 
 ## Referências
 
